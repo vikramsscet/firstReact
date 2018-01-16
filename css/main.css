@@ -41,10 +41,6 @@ li a:hover {
     box-sizing: border-box;
 }
 
-body {
-    margin: 0;
-}
-
 /* Create four equal columns that floats next to each other */
 .column {
     float: left;
@@ -62,7 +58,7 @@ body {
 
 
 /*---------footer css-----------------*/
-.footerT {
+/*.footerT {
     position: fixed;
     left: 0;
     bottom: 0;
@@ -70,5 +66,59 @@ body {
     background-color: red;
     color: white;
     text-align: center;
-}
+}*/
 /*---------footer css-----------------*/
+
+.gameContainer{
+	width : 450px;
+	height : 450px;
+	position:absolute;
+	background-color:white;
+	border-style:solid;
+	border-color:black;
+	margin-bottom:60px;
+}
+.gamebox{
+	width:50px;
+	height:50px;
+	margin-left:5px;
+	margin-bottom:5px;
+	margin-top:5px;
+	border:0.5px;
+	border-style: solid;
+	border-color:black;
+	position:relative;
+	background-color:white;
+	float:left;
+}
+.gameXxXContainer{
+	background-color:gray;
+	height:70%;
+	width:285px;
+	position:relative;
+	left:50px;
+}
+.gameResultContainer{
+	//margin-top:10px;
+	position:relative;
+	width:100%;
+	height:30%;
+	border-style:solid;
+	border-color:black;
+}
+
+.gameResult{
+	position:relative;
+	width:100%;
+	height:70%;
+	background-color:lime;
+}
+
+.gameDifficultyLevel{
+	position:absolute;
+	width:100%;
+	height:30%;
+	border-top-style:solid;
+	border-color:black;
+	
+}

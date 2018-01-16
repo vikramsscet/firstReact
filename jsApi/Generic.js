@@ -36,7 +36,6 @@ export let Generic = {
 		let uName = document.getElementsByName('uname')[0].value;
 		let passwrd = document.getElementsByName('passwrd')[0].value;
 		let stateObj = this.state;
-		console.log(uName, passwrd);
 		let findUser = function(userObj, index){
 			return userObj.userName === uName && userObj.password === passwrd;
 		};
@@ -69,9 +68,7 @@ export let Generic = {
 			var xhttp = new XMLHttpRequest();
 			xhttp.open("GET", url, true);
 			xhttp.setRequestHeader("Content-type", "application/json");
-			console.log("+++++",url);
 			xhttp.onreadystatechange = function(){
-				console.log(xhttp);
 				if (xhttp.readyState === 4 && (xhttp.status === 200 || xhttp.status  === 304)){
 					resolve(JSON.parse(xhttp.response));
 				}
@@ -82,6 +79,28 @@ export let Generic = {
 			xhttp.onerror = () => reject(xhttp.statusText);
 			xhttp.send();
 		});
+	},
+	getRandomArray(num){
+			let min = 0;
+			let max = 24;
+			let randomNums = [];
+			let randomNum,i=0;
+			while(i<num){
+				randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+				if(i===0){
+					randomNums.push(randomNum);
+					i++;
+				}
+				else if(i > 0 && randomNums.indexOf(randomNum) === -1){
+					randomNums.push(randomNum);
+					i++;
+				}
+			}
+			return randomNums;
+	},
+	changeBackgroundColor(id, color){
+		let x = document.getElementById(id);
+		x.style.backgroundColor=color;
 	}
 	
 };
