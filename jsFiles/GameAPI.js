@@ -3,10 +3,12 @@ import lodash from 'lodash';
 import 'babel-polyfill';
 const showElementClass = {};
 const hideElementClass = {'display':'none'};
+const eachGameWaitSecs = 10;
+ 
 export let GameApi = {
 	resetTimer(){
 		let stateObj = this.state;
-		stateObj.timeCounter = 5;
+		stateObj.timeCounter = eachGameWaitSecs;
 		this.setState(stateObj);
 	},
 	showRemainingTime(){
@@ -22,20 +24,24 @@ export let GameApi = {
 		},1000);
 	},
 	boxEvent(e){
-		console.log("----clicking box----",e.target.id,this.state);
+		let boxId = parseInt(e.target.id);
 		let stateObj = this.state;
-		
+		console.log(typeof stateObj.randomNums, Array.isArray(stateObj.randomNums));
 		if(stateObj.moveAllowed){
-			
+			stateObj.attemptCount++;
+			if(this.state.attemptCount >= 7){
+				stateObj.resultBox.attemptWarning = showElementClass;
+			}else{
+				stateObj.userSelectedBox.push(boxId);
+				if(stateObj.randomNums.indexOf(boxId) > -1){
+					e.target.style.backgroundColor='blue';
+				}else{
+					e.target.style.backgroundColor='red';
+				}
+			}
+			this.setState(stateObj);
 		}else{
 			stateObj.resultBox.moveWarning = showElementClass;
-		}
-		
-		stateObj.attemptCount++;
-		this.setState(stateObj);
-		if(this.state.attemptCount === 7){
-			stateObj.resultBox.attemptWarning = showElementClass;
-			this.setState(stateObj);
 		}
 	},
 	
@@ -45,23 +51,44 @@ export let GameApi = {
 		this.setState(stateObj);
 	},
 	
-	setRandomColors(color){
-		for(let i=0; i<this.state.randomNums.length; i++){
-			Generic.changeBackgroundColor(this.state.randomNums[i], color);
+	setRandomColors(color,all=false){
+		
+		if(all){
+			//Paints all boxes to white...
+			for(let i=0; i<25; i++){
+				Generic.changeBackgroundColor(i, color);
+			}	
+		}else{
+			for(let i=0; i<this.state.randomNums.length; i++){
+				Generic.changeBackgroundColor(this.state.randomNums[i], color);
+			}
 		}
 	},
-	simulateBoxGame(){
-		if(this.state.randomNums.length > 0){
-			GameApi.setRandomColors.call(this,this.state.neutralColor);
-		}
+	clearMsgArea(){
 		let stateObj = this.state;
+		stateObj.resultBox.waitMsg = hideElementClass;
+		stateObj.resultBox.startMsg = hideElementClass;
+		stateObj.resultBox.resultMsg = hideElementClass;
+		stateObj.resultBox.attemptWarning = hideElementClass;
+		stateObj.resultBox.moveWarning = hideElementClass;
+		stateObj.resultBox.timerClass = hideElementClass;
+		this.setState(stateObj);
+	},
+	simulateBoxGame(){
+		
+		let stateObj = this.state;
+		stateObj.attemptCount=0;
 		stateObj.isGameRunning = true;
 		this.setState(stateObj);
 		var counter=1;
 		function* gameStart(){
 			while(this.state.isGameRunning){
+				this.setRandomColors(this.state.neutralColor,true);
+				this.clearMsgArea();
 				yield showBlueBox.call(this);
+				this.clearMsgArea();
 				yield showWhiteBox.call(this);
+				yield saveOperation.call(this);
 				if(counter==5){
 					this.stopGame();
 				}
@@ -69,18 +96,15 @@ export let GameApi = {
 			}
 		}
 		function showBlueBox(){
-			console.log("from blueBox after 2 sec",counter);
 			let stateObj = this.state;
+			stateObj.attemptCount = 0;
 			stateObj.randomNums = [];
 			stateObj.randomNums = Generic.getRandomArray(this.state.currentDifficultyLevel);
 			
 			this.setRandomColors(this.state.gameColor);
 			
 			stateObj.resultBox.waitMsg = showElementClass;
-			stateObj.resultBox.startMsg = hideElementClass;
-			stateObj.resultBox.moveWarning = hideElementClass;
 			stateObj.moveAllowed = false;
-			stateObj.resultBox.timerClass = hideElementClass;
 			this.setState(stateObj);
 			setTimeout(()=>{
 				this.resetTimer();
@@ -90,9 +114,7 @@ export let GameApi = {
 		function showWhiteBox(){
 			let stateObj = this.state;
 			this.setRandomColors(this.state.neutralColor);
-			stateObj.resultBox.waitMsg = hideElementClass;
 			stateObj.resultBox.startMsg = showElementClass;
-			stateObj.resultBox.moveWarning = hideElementClass;
 			stateObj.resultBox.timerClass = showElementClass;
 			stateObj.moveAllowed = true;
 			this.setState(stateObj);
@@ -100,7 +122,23 @@ export let GameApi = {
 			setTimeout(()=>{
 				console.log("from whiteBox after 5 sec",counter);
 				it.next();
-			},5000);
+			},10000);
+		}
+		
+		function saveOperation(){
+			let stateObj = this.state;
+			
+			stateObj.overAllGameResults.push({
+				'actualBoxes':stateObj.randomNums,
+				'userBoxes':stateObj.userSelectedBox
+			});
+			stateObj.userSelectedBox = [];
+			this.setState(stateObj);
+			setTimeout(()=>{
+				console.log(this.state);
+				console.log("saving operation....",counter);
+				it.next();
+			},2000);
 		}
 		var it = gameStart.call(this);
 		it.next();

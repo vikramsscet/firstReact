@@ -12,16 +12,15 @@ class Content extends React.Component {
 			gameColor : 'blue',
 			neutralColor : 'white',
 			boxes:[],
-			randomNums:[],
+			randomNums:[], //these are random user selection numbers.
 			currentDifficultyLevel:5,
-			time:7000,
 			difficultyLevels : {
 				5 : "Easy",
 				7 : "Medium",
 				9 : "Difficult"
 			},
-			gameCounter : 5,
-			timeCounter : 5,
+			timeCounter : 10,
+			isGameRunning : false,
 			resultBox:{
 				waitMsg:hideElementClass,
 				startMsg:hideElementClass,
@@ -30,7 +29,8 @@ class Content extends React.Component {
 				moveWarning : hideElementClass,
 				timerClass : hideElementClass
 			},
-			gameResults:[],
+			overAllGameResults:[],
+			userSelectedBox:[],
 			attemptCount : 0,
 			moveAllowed : false,
 			commonMessages : {
@@ -55,7 +55,7 @@ class Content extends React.Component {
 		this.showRemainingTime = GameApi.showRemainingTime.bind(this);
 		this.resetTimer = GameApi.resetTimer.bind(this);
 		this.setRandomColors = GameApi.setRandomColors.bind(this);
-		
+		this.clearMsgArea = GameApi.clearMsgArea.bind(this);
 	};
 	addBoxes(){
 		let stateObj = this.state;
@@ -114,12 +114,12 @@ class GameDifficultyLevel extends React.Component{
 	render(){
 		return(
 			<div className='gameDifficultyLevel'>
-				<button name='easy' value='5' onClick={this.props.setDiffLevel}>Easy</button>
-				<button name='medium' value='7' onClick={this.props.setDiffLevel}>Medium</button>
-				<button name='difficult' value='9' onClick={this.props.setDiffLevel}>Difficult</button>
-				<button name='start' onClick={this.props.startGame}>Start</button>
-				<button name='stop' onClick={this.props.stopGame}>Stop & Reset</button>
-				<span >Diffculty Level : <span id="diffLevel">{this.props.diffLevel()}</span></span>
+				<button className="btn btn-primary btn-xs customButton" name='easy' value='5' onClick={this.props.setDiffLevel}>Easy</button>
+				<button className="btn btn-info btn-xs customButton" name='medium' value='7' onClick={this.props.setDiffLevel}>Medium</button>
+				<button className="btn btn-warning btn-xs customButton" name='difficult' value='9' onClick={this.props.setDiffLevel}>Difficult</button>
+				<button className="btn btn-primary btn-xs customButton" name='start' onClick={this.props.startGame}>Start</button>
+				<button className="btn btn-danger btn-xs customButton" name='stop' onClick={this.props.stopGame}>Stop & Reset</button>
+				<span ><b> Level :</b> <span id="diffLevel">{this.props.diffLevel()}</span></span>
 			</div>
 		);
 	}
@@ -129,11 +129,11 @@ class GameResult extends React.Component{
 	render(){
 		return(
 			<div className='gameResult'>
-				<span style={this.props.resultCSS.waitMsg}>Wait & memorize boxes...</span>
-				<span style={this.props.resultCSS.startMsg}>Start selecting box...</span>
-				<span style={this.props.resultCSS.resultMsg}>Your Result...</span>
-				<span style={this.props.resultCSS.attemptWarning}>Your attempts are Over :( </span>
-				<span style={this.props.resultCSS.moveWarning}>Not allowed to make selection...</span>
+				<span className='msg' style={this.props.resultCSS.waitMsg}>Wait & memorize boxes...</span>
+				<span className='msg' style={this.props.resultCSS.startMsg}>Start selecting box...</span>
+				<span className='msg' style={this.props.resultCSS.resultMsg}>Your Result...</span>
+				<span className='msg' style={this.props.resultCSS.attemptWarning}>Your attempts are Over :( </span>
+				<span className='msg' style={this.props.resultCSS.moveWarning}>Not allowed to make selection...</span>
 				<ShowTimer timerClass={this.props.resultCSS.timerClass} timer={this.props.timer} />
 			</div>
 		);
