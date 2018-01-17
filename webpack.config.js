@@ -1,5 +1,5 @@
 var config = {
-   entry: './main.js',
+   entry: ['babel-polyfill','./main.js'],
    output: {
       path:'/',
       filename: 'index.js',
