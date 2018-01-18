@@ -26,23 +26,17 @@ export let GameApi = {
 	boxEvent(e){
 		let boxId = parseInt(e.target.id);
 		let stateObj = this.state;
-		console.log(typeof stateObj.randomNums, Array.isArray(stateObj.randomNums));
-		if(stateObj.moveAllowed){
-			stateObj.attemptCount++;
-			if(this.state.attemptCount >= 7){
-				stateObj.resultBox.attemptWarning = showElementClass;
+		if(stateObj.moveAllowed){			
+			stateObj.userSelectedBox.push(boxId);
+			if(stateObj.randomNums.indexOf(boxId) > -1){
+				e.target.style.backgroundColor='blue';
 			}else{
-				stateObj.userSelectedBox.push(boxId);
-				if(stateObj.randomNums.indexOf(boxId) > -1){
-					e.target.style.backgroundColor='blue';
-				}else{
-					e.target.style.backgroundColor='red';
-				}
+				e.target.style.backgroundColor='red';
 			}
-			this.setState(stateObj);
 		}else{
 			stateObj.resultBox.moveWarning = showElementClass;
 		}
+		this.setState(stateObj);
 	},
 	
 	handleClick(counter){
@@ -77,7 +71,6 @@ export let GameApi = {
 	simulateBoxGame(){
 		
 		let stateObj = this.state;
-		stateObj.attemptCount=0;
 		stateObj.isGameRunning = true;
 		this.setState(stateObj);
 		var counter=1;
@@ -97,14 +90,12 @@ export let GameApi = {
 		}
 		function showBlueBox(){
 			let stateObj = this.state;
-			stateObj.attemptCount = 0;
 			stateObj.randomNums = [];
 			stateObj.randomNums = Generic.getRandomArray(this.state.currentDifficultyLevel);
 			
 			this.setRandomColors(this.state.gameColor);
 			
 			stateObj.resultBox.waitMsg = showElementClass;
-			stateObj.moveAllowed = false;
 			this.setState(stateObj);
 			setTimeout(()=>{
 				this.resetTimer();
@@ -120,14 +111,13 @@ export let GameApi = {
 			this.setState(stateObj);
 			this.showRemainingTime();
 			setTimeout(()=>{
-				console.log("from whiteBox after 5 sec",counter);
 				it.next();
 			},10000);
 		}
 		
 		function saveOperation(){
 			let stateObj = this.state;
-			
+			stateObj.moveAllowed = false;
 			stateObj.overAllGameResults.push({
 				'actualBoxes':stateObj.randomNums,
 				'userBoxes':stateObj.userSelectedBox
@@ -152,6 +142,20 @@ export let GameApi = {
 		stateObj.resultBox.resultMsg = showElementClass;
 		stateObj.resultBox.attemptWarning = hideElementClass;
 		stateObj.resultBox.timerClass = hideElementClass;
+		let gameResult = [];
+		for(let i=0; i<stateObj.overAllGameResults.length; i++){
+			
+			let gameStats = stateObj.overAllGameResults[i]; 
+			console.log(gameStats);
+			if(gameStats.userBoxes.length > stateObj.foulLevel){
+				gameResult.push(`Disqualified in game ${i+1} because total number of attempts is greater than ${stateObj.foulLevel}`);
+			}else{
+				let correctAttempts = gameStats.userBoxes.filter(function(obj) { return gameStats.actualBoxes.indexOf(obj) > -1; });
+				console.log(correctAttempts,"correctAttempts");
+				gameResult.push(`${correctAttempts.length} out of ${gameStats.actualBoxes.length} are correct attempts`);
+			}
+		}
+		stateObj.finalResult = gameResult.join('--');
 		this.setState(stateObj);
 	},
 	
@@ -159,6 +163,7 @@ export let GameApi = {
 		let stateObj = this.state;
 		let newDiffLevel = e.target.value;
 		stateObj.currentDifficultyLevel = newDiffLevel;
+		stateObj.foulLevel = parseInt(stateObj.currentDifficultyLevel)+2;
 		this.setState(stateObj);
 	},
 	getDiffLevel(){

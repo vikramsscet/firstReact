@@ -127,3 +127,8 @@ li a:hover {
     width: 80px !important;
 	margin:10px !important;
 }
+
+.col-15 {
+    width: 20%;
+    float: left;
+}

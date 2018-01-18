@@ -14,6 +14,7 @@ class Content extends React.Component {
 			boxes:[],
 			randomNums:[], //these are random user selection numbers.
 			currentDifficultyLevel:5,
+			foulLevel : 0,
 			difficultyLevels : {
 				5 : "Easy",
 				7 : "Medium",
@@ -40,7 +41,8 @@ class Content extends React.Component {
 				resultMsg : "Your Result...",
 				attemptWarningMsg : "Your attempts are Over :( ",
 				moveMsg : "Not allowed to make selection..."
-			}
+			},
+			finalResult : ""
 		}
 		
 		console.log(GameApi);
@@ -59,6 +61,7 @@ class Content extends React.Component {
 	};
 	addBoxes(){
 		let stateObj = this.state;
+		stateObj.foulLevel = parseInt(stateObj.currentDifficultyLevel)+2;
 		for(let i=0; i<25; i++){
 			stateObj.boxes.push(<GameBox boxEvent={this.boxEvent} key={i} id={i} />);
 		}
@@ -80,7 +83,7 @@ class Content extends React.Component {
 					<div className="gameXxXContainer">
 						{this.state.boxes}
 					</div>
-					<GameResultContainer timer={this.state.timeCounter} resultCSS={this.state.resultBox} stopGame={this.stopGame} startGame={this.simulateBoxGame} diffLevel={this.getDiffLevel} setDiffLevel={this.setDiffLevel} />
+					<GameResultContainer timer={this.state.timeCounter} resultCSS={this.state.resultBox} stopGame={this.stopGame} startGame={this.simulateBoxGame} diffLevel={this.getDiffLevel} setDiffLevel={this.setDiffLevel} finalResult={this.state.finalResult} />
 				</div>
 			</div>	
 		);
@@ -100,7 +103,7 @@ class GameResultContainer extends React.Component{
 	render(){
 		return(
 			<div className='gameResultContainer'>
-				<GameResult timer={this.props.timer} resultCSS={this.props.resultCSS} />
+				<GameResult finalResult={this.props.finalResult} timer={this.props.timer} resultCSS={this.props.resultCSS} />
 				<GameDifficultyLevel startGame={this.props.startGame} stopGame={this.props.stopGame}  diffLevel={this.props.diffLevel} setDiffLevel={this.props.setDiffLevel} />
 			</div>
 		);
@@ -131,7 +134,7 @@ class GameResult extends React.Component{
 			<div className='gameResult'>
 				<span className='msg' style={this.props.resultCSS.waitMsg}>Wait & memorize boxes...</span>
 				<span className='msg' style={this.props.resultCSS.startMsg}>Start selecting box...</span>
-				<span className='msg' style={this.props.resultCSS.resultMsg}>Your Result...</span>
+				<span className='msg' style={this.props.resultCSS.resultMsg}>{this.props.finalResult}</span>
 				<span className='msg' style={this.props.resultCSS.attemptWarning}>Your attempts are Over :( </span>
 				<span className='msg' style={this.props.resultCSS.moveWarning}>Not allowed to make selection...</span>
 				<ShowTimer timerClass={this.props.resultCSS.timerClass} timer={this.props.timer} />
